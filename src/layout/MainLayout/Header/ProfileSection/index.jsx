@@ -1,0 +1,393 @@
+/* eslint-disable prettier/prettier */
+import { useState, useRef, useEffect } from 'react';
+
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
+// material-ui
+import { useTheme } from '@mui/material/styles';
+import {
+  Avatar,
+  Box,
+  Chip,
+  ClickAwayListener,
+  Divider,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Popper,
+  Stack,
+  Typography
+} from '@mui/material';
+
+// third-party
+import PerfectScrollbar from 'react-perfect-scrollbar';
+
+// project imports
+import MainCard from '@/ui-component/cards/MainCard';
+import Transitions from '@/ui-component/extended/Transitions';
+import { tokenPayload } from '@/helper';
+
+// assets
+import { IconLogout, IconSettings, IconUser } from '@tabler/icons';
+import { useTranslation } from 'react-i18next';
+
+
+const ProfileSection = () => {
+  const {t} = useTranslation();
+  const payload = tokenPayload();
+  const theme = useTheme();
+  const customization = useSelector((state) => state.customization);
+  const navigate = useNavigate();
+
+  const [open, setOpen] = useState(false);
+
+  const anchorRef = useRef(null);
+
+  const handleLogout = async () => {
+    localStorage.removeItem('$2b$10$ehdPSDmr6P');
+    navigate('/login');
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const prevOpen = useRef(open);
+  useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current.focus();
+    }
+    prevOpen.current = open;
+  }, [open]);
+
+  return (
+    <>
+      <Chip
+        sx={{
+          height: '48px',
+          alignItems: 'center',
+          borderRadius: '27px',
+          transition: 'all .2s ease-in-out',
+          borderColor: theme.palette.primary.light,
+          backgroundColor: theme.palette.primary.light,
+          '&[aria-controls="menu-list-grow"], &:hover': {
+            borderColor: theme.palette.primary.main,
+            background: `${theme.palette.primary.main}!important`,
+            color: theme.palette.primary.light,
+            '& svg': {
+              stroke: theme.palette.primary.light
+            }
+          },
+          '& .MuiChip-label': {
+            lineHeight: 0
+          }
+        }}
+        icon={
+          <Avatar
+            src={payload.avatar || 'path/to/default/avatar'} // Optional fallback for avatar
+            sx={{
+              ...theme.typography.mediumAvatar,
+              margin: '8px 0 8px 8px !important',
+              cursor: 'pointer'
+            }}
+            ref={anchorRef}
+            aria-controls={open ? 'menu-list-grow' : undefined}
+            aria-haspopup="true"
+            color="inherit"
+          />
+        }
+        label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
+        variant="outlined"
+        ref={anchorRef}
+        aria-controls={open ? 'menu-list-grow' : undefined}
+        aria-haspopup="true"
+        onClick={handleToggle}
+        color="primary"
+      />
+      <Popper
+        placement="bottom-end"
+        open={open}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        transition
+        disablePortal
+        popperOptions={{
+          modifiers: [
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 14]
+              }
+            }
+          ]
+        }}
+      >
+        {({ TransitionProps }) => (
+          <Transitions in={open} {...TransitionProps}>
+            <Paper>
+              <ClickAwayListener onClickAway={handleClose}>
+                <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
+                  <Box sx={{ p: 2 }}>
+                    <Stack>
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        <Typography variant="h4">{t('Welcome')},</Typography>
+                        <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
+                          {payload.name}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                    <Divider />
+                  </Box>
+                  <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
+                    <Box sx={{ p: 2 }}>
+                      <Divider />
+                      <Typography variant="subtitle2">Email: {payload.email}</Typography>
+                      <Divider />
+                      <Typography variant="subtitle2">Role: {payload.role}</Typography>
+                      <Divider />
+                      <List
+                        component="nav"
+                        sx={{
+                          width: '100%',
+                          maxWidth: 350,
+                          minWidth: 300,
+                          backgroundColor: theme.palette.background.paper,
+                          borderRadius: '10px',
+                          [theme.breakpoints.down('md')]: {
+                            minWidth: '100%'
+                          },
+                          '& .MuiListItemButton-root': {
+                            mt: 0.5
+                          }
+                        }}
+                      >
+                        <ListItemButton
+                          sx={{ borderRadius: `${customization.borderRadius}px` }}
+                          onClick={handleLogout}
+                        >
+                          <ListItemIcon>
+                            <IconLogout stroke={1.5} size="1.3rem" />
+                          </ListItemIcon>
+                          <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+                        </ListItemButton>
+                      </List>
+                    </Box>
+                  </PerfectScrollbar>
+                </MainCard>
+              </ClickAwayListener>
+            </Paper>
+          </Transitions>
+        )}
+      </Popper>
+    </>
+  );
+};
+
+export default ProfileSection;
+
+
+
+
+
+// /* eslint-disable prettier/prettier */
+// import { useState, useRef, useEffect } from 'react';
+
+// import { useNavigate } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
+
+// // material-ui
+// import { useTheme } from '@mui/material/styles';
+// import {
+//   Avatar,
+//   Box,
+//   Chip,
+//   ClickAwayListener,
+//   Divider,
+//   Grid,
+//   List,
+//   ListItemButton,
+//   ListItemIcon,
+//   ListItemText,
+//   Paper,
+//   Popper,
+//   Stack,
+//   Typography
+// } from '@mui/material';
+
+// // third-party
+// import PerfectScrollbar from 'react-perfect-scrollbar';
+
+// // project imports
+// import MainCard from '@/ui-component/cards/MainCard';
+// import Transitions from '@/ui-component/extended/Transitions';
+// import { tokenPayload } from '@/helper';
+
+// // assets
+// import { IconLogout, IconSettings, IconUser } from '@tabler/icons';
+// import { useTranslation } from 'react-i18next';
+
+
+// const ProfileSection = () => {
+//   const {t} = useTranslation();
+//   const payload = tokenPayload();
+//   const theme = useTheme();
+//   const customization = useSelector((state) => state.customization);
+//   const navigate = useNavigate();
+
+//   const [open, setOpen] = useState(false);
+
+//   const anchorRef = useRef(null);
+
+//   const handleLogout = async () => {
+//     localStorage.removeItem('$2b$10$ehdPSDmr6P');
+//     navigate('/login');
+//   };
+
+//   const handleClose = (event) => {
+//     if (anchorRef.current && anchorRef.current.contains(event.target)) {
+//       return;
+//     }
+//     setOpen(false);
+//   };
+
+//   const handleToggle = () => {
+//     setOpen((prevOpen) => !prevOpen);
+//   };
+
+//   const prevOpen = useRef(open);
+//   useEffect(() => {
+//     if (prevOpen.current === true && open === false) {
+//       anchorRef.current.focus();
+//     }
+//     prevOpen.current = open;
+//   }, [open]);
+
+//   return (
+   
+
+// <>
+//   {/* Profile Toggle Button */}
+//   <Chip
+//     sx={{
+//       height: '48px',
+//       alignItems: 'center',
+//       borderRadius: '27px',
+//       transition: 'all .2s ease-in-out',
+//       borderColor: theme.palette.primary.light,
+//       backgroundColor: theme.palette.primary.light,
+//       '&[aria-controls="menu-list-grow"], &:hover': {
+//         borderColor: theme.palette.primary.main,
+//         background: `${theme.palette.primary.main}!important`,
+//         color: theme.palette.primary.light,
+//         '& svg': {
+//           stroke: theme.palette.primary.light
+//         }
+//       },
+//       '& .MuiChip-label': { lineHeight: 0 }
+//     }}
+//     icon={
+//       <Avatar
+//         src={payload.avatar || '/default-avatar.png'}
+//         sx={{
+//           ...theme.typography.mediumAvatar,
+//           margin: '8px 0 8px 8px !important',
+//           cursor: 'pointer'
+//         }}
+//         ref={anchorRef}
+//         aria-controls={open ? 'menu-list-grow' : undefined}
+//         aria-haspopup="true"
+//       />
+//     }
+//     label={<IconSettings stroke={1.5} size="1.5rem" color={theme.palette.primary.main} />}
+//     variant="outlined"
+//     ref={anchorRef}
+//     aria-controls={open ? 'menu-list-grow' : undefined}
+//     aria-haspopup="true"
+//     onClick={handleToggle}
+//     color="primary"
+//   />
+
+//   {/* Background Blur */}
+//   {open && (
+//     <Box
+//       onClick={handleClose}
+//       sx={{
+//         position: 'fixed',
+//         top: 0,
+//         left: 0,
+//         width: '100%',
+//         height: '100%',
+//         backgroundColor: 'rgba(0,0,0,0.3)',
+//         backdropFilter: 'blur(1px)',
+//         zIndex: 1200
+//       }}
+//     />
+//   )}
+
+//   {/* Profile Popper */}
+//   <Popper
+//     placement="bottom-end"
+//     open={open}
+//     anchorEl={anchorRef.current}
+//     role={undefined}
+//     transition
+//     disablePortal
+//     sx={{ zIndex: 1300 }}
+//   >
+//     {({ TransitionProps }) => (
+//       <Transitions in={open} {...TransitionProps}>
+//         <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
+//           <ClickAwayListener onClickAway={handleClose}>
+//             <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
+//               <Box sx={{ p: 3, textAlign: 'center' }}>
+//                 {/* Avatar + Name */}
+//                 <Avatar
+//                   src={payload.avatar || '/default-avatar.png'}
+//                   sx={{ width: 72, height: 72, mx: 'auto', mb: 2 }}
+//                 />
+//                 <Typography variant="h5">{payload.name}</Typography>
+//                 <Typography variant="body2" color="text.secondary">
+//                   {payload.role}
+//                 </Typography>
+
+//                 {/* Email */}
+//                 <Typography variant="subtitle2" sx={{ mt: 1, mb: 2 }}>
+//                   {payload.email}
+//                 </Typography>
+
+//                 <Divider sx={{ my: 2 }} />
+
+//                 {/* Actions */}
+//                 <List component="nav" sx={{ p: 0 }}>
+//                   <ListItemButton onClick={handleLogout} sx={{ borderRadius: `${customization.borderRadius}px` }}>
+//                     <ListItemIcon>
+//                       <IconLogout stroke={1.5} size="1.3rem" />
+//                     </ListItemIcon>
+//                     <ListItemText primary={<Typography variant="body2">Logout</Typography>} />
+//                   </ListItemButton>
+//                 </List>
+//               </Box>
+//             </MainCard>
+//           </ClickAwayListener>
+//         </Paper>
+//       </Transitions>
+//     )}
+//   </Popper>
+// </>
+//   );
+// };
+
+// export default ProfileSection;
+
+
